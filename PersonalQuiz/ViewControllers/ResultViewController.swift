@@ -7,23 +7,50 @@
 
 import UIKit
 
-class ResultViewController: UIViewController {
+final class ResultViewController: UIViewController {
     
-    // 1. Избавиться от кнопки возврата назад на экране результатов
-    // 2. Передать массив с ответами на экран с результатами
-    // 3. Определить наиболее часто встречающийся тип животного
-    // 4. Отобразить результаты в соответствии с этим животным
+    @IBOutlet var emojiLabel: UILabel!
+    @IBOutlet var resultLabel: UILabel!
+    
+    var answers: [Answer]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationItem.hidesBackButton = true
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        
+        setResult()
+    }
+    
+    private func setResult() {
+        guard let animal = defineResult() else { return }
 
+        emojiLabel.text = "Вы - \(animal.rawValue)"
+        resultLabel.text = animal.definition
+    }
+    
+    private func defineResult() -> Animal? {
+        let animals = answers.map { $0.animal }
+        
+        var result = (1, animals.first)
+        
+        for animal in animals {
+            var count = 0
+            for index in 0..<animals.count {
+                if animal == animals[index] {
+                    count += 1
+                }
+            }
+            if count > result.0 {
+                result = (count, animal)
+            }
+        }
+        
+        guard let animal = result.1 else { return nil }
+        return animal
     }
     
     @IBAction func doneButtonPressed(_ sender: UIBarButtonItem) {
         dismiss(animated: true)
-    }
-    
-    deinit {
-        print("\(type(of: self)) has been deallocated")
     }
 }
